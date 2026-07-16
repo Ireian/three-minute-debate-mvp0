@@ -43,3 +43,17 @@ TypeScript 类型检查通过，Vite 生成生产构建。
 ### T5 回归确认
 
 2026-07-16 再次运行完整规则测试、100 个固定随机种子的模拟对局和 production build；BUG-001 未复现。
+
+## BUG-002：首次 GitHub Pages 构建无法安装依赖
+
+- 日期：2026-07-16
+- 状态：已修复
+- 发现阶段：Block 07 公开部署
+
+### 现象与根因
+
+GitHub 的 Linux 构建机运行 `npm ci` 时，报告依赖锁文件缺少 `@emnapi/core` 和 `@emnapi/runtime`。原锁文件是在已有 Windows `node_modules` 的情况下生成的，没有完整记录跨平台可选依赖。
+
+### 修复与验证
+
+在不读取现有 `node_modules` 的情况下重新生成 `package-lock.json`，补全跨平台可选依赖；Linux 目标的 `npm ci --dry-run`、15 项自动测试和 production build 均通过。
