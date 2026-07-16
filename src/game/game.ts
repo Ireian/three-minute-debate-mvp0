@@ -1,48 +1,101 @@
+import { CARD_IDS, getCard, type CardId } from "./cards";
+
+export type GameStatus = "playing" | "won" | "lost";
+export type RandomSource = () => number;
+
 export interface GameState {
   playerIntegrity: number;
   opponentIntegrity: number;
   round: number;
   status: GameStatus;
   message: string;
+  hand: CardId[];
+  nextCardDamageBonus: number;
 }
 
-export type GameStatus = "playing" | "won" | "lost";
-
 export const INITIAL_INTEGRITY = 10;
-export const CLAIM_DAMAGE = 3;
 export const OPPONENT_RESPONSE_DAMAGE = 2;
 export const MAX_ROUNDS = 5;
+export const HAND_SIZE = 3;
 
-export function createInitialState(): GameState {
+export function drawHand(random: RandomSource = Math.random): CardId[] {
+  const pool = [...CARD_IDS];
+
+  for (let index = pool.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(random() * (index + 1));
+    [pool[index], pool[swapIndex]] = [pool[swapIndex], pool[index]];
+  }
+
+  return pool.slice(0, HAND_SIZE);
+}
+
+export function createInitialState(
+  random: RandomSource = Math.random,
+): GameState {
   return {
     playerIntegrity: INITIAL_INTEGRITY,
     opponentIntegrity: INITIAL_INTEGRITY,
     round: 1,
     status: "playing",
-    message: "选择主张，开始第一回合。",
+    message: "从三张卡中选择一张，开始第一回合。",
+    hand: drawHand(random),
+    nextCardDamageBonus: 0,
   };
 }
-
-export function playClaim(state: GameState): GameState {
-  if (state.status !== "playing") {
+export function playCard(
+  state: GameState,
+  cardId: CardId,
+  random: RandomSource = Math.random,
+): GameState {
+  if (state.status !== "playing" || !state.hand.includes(cardId)) {
     return state;
   }
 
-  const opponentIntegrity = Math.max(0, state.opponentIntegrity - CLAIM_DAMAGE);
+  const card = getCard(cardId);
+  const conditionalBonus =
+    card.bonusDamageWhenOpponentNotWeaker !== undefined &&
+    state.opponentIntegrity >= state.playerIntegrity
+      ? card.bonusDamageWhenOpponentNotWeaker
+      : 0;
+  const damage =
+    card.baseDamage + conditionalBonus + state.nextCardDamageBonus;
+  const opponentIntegrity = Math.max(0, state.opponentIntegrity - damage);
+  const playerAfterCard = Math.min(
+    INITIAL_INTEGRITY,
+    Math.max(
+      0,
+      state.playerIntegrity - (card.selfDamage ?? 0) + (card.selfHeal ?? 0),
+    ),
+  );
+  const nextCardDamageBonus = card.nextCardDamageBonus ?? 0;
+
+  if (playerAfterCard === 0) {
+    return {
+      ...state,
+      playerIntegrity: 0,
+      opponentIntegrity,
+      status: "lost",
+      nextCardDamageBonus,
+      message: `${card.name}使你的论证先崩溃了。`,
+    };
+  }
 
   if (opponentIntegrity === 0) {
     return {
       ...state,
+      playerIntegrity: playerAfterCard,
       opponentIntegrity,
       status: "won",
-      message: `你在第 ${state.round} 回合击破了对方论证。`,
+      nextCardDamageBonus,
+      message: `${card.name}造成 ${damage} 点影响；你在第 ${state.round} 回合获胜。`,
     };
   }
 
-  const playerIntegrity = Math.max(
+  const responseDamage = Math.max(
     0,
-    state.playerIntegrity - OPPONENT_RESPONSE_DAMAGE,
+    OPPONENT_RESPONSE_DAMAGE - (card.responseReduction ?? 0),
   );
+  const playerIntegrity = Math.max(0, playerAfterCard - responseDamage);
 
   if (playerIntegrity === 0) {
     return {
@@ -50,7 +103,8 @@ export function playClaim(state: GameState): GameState {
       playerIntegrity,
       opponentIntegrity,
       status: "lost",
-      message: `对手在第 ${state.round} 回合击破了你的论证。`,
+      nextCardDamageBonus,
+      message: `${card.name}造成 ${damage} 点影响，但对手的回应击破了你。`,
     };
   }
 
@@ -60,15 +114,23 @@ export function playClaim(state: GameState): GameState {
       playerIntegrity,
       opponentIntegrity,
       status: "lost",
+      nextCardDamageBonus,
       message: "五回合结束，你未能击破对方论证。",
     };
   }
+
+  const bonusMessage =
+    nextCardDamageBonus > 0
+      ? ` 下一张卡额外造成 ${nextCardDamageBonus} 点影响。`
+      : "";
 
   return {
     ...state,
     playerIntegrity,
     opponentIntegrity,
     round: state.round + 1,
-    message: `主张命中，对手回应：你的完整度 −${OPPONENT_RESPONSE_DAMAGE}。`,
+    hand: drawHand(random),
+    nextCardDamageBonus,
+    message: `${card.name}造成 ${damage} 点影响；对手回应 −${responseDamage}。${bonusMessage}`,
   };
 }

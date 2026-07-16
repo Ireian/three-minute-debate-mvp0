@@ -98,14 +98,20 @@ h1 {
   font-size: 1.8rem;
 }
 
-.claim-card {
-  width: min(100%, 290px);
+.card-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.debate-card {
+  width: 100%;
   min-height: 180px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 12px;
-  margin: 0 auto;
+  margin: 0;
   padding: 22px;
   color: #201b14;
   text-align: left;
@@ -119,12 +125,12 @@ h1 {
     box-shadow 140ms ease;
 }
 
-.claim-card:hover {
+.debate-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 23px 52px rgba(0, 0, 0, 0.44);
 }
 
-.claim-card:disabled {
+.debate-card:disabled {
   filter: grayscale(0.75);
   cursor: not-allowed;
   opacity: 0.48;
@@ -132,7 +138,7 @@ h1 {
   box-shadow: none;
 }
 
-.claim-card:focus-visible {
+.debate-card:focus-visible {
   outline: 3px solid #f4d58e;
   outline-offset: 5px;
 }
@@ -146,7 +152,7 @@ h1 {
   letter-spacing: 0.12em;
 }
 
-.claim-card strong {
+.debate-card strong {
   margin-top: 8px;
   font-family: Georgia, "Noto Serif SC", serif;
   font-size: 1.35rem;
@@ -175,6 +181,10 @@ h1 {
 
 @media (max-width: 520px) {
   .integrity-row {
+    grid-template-columns: 1fr;
+  }
+
+  .card-row {
     grid-template-columns: 1fr;
   }
 }

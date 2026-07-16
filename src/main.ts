@@ -1,5 +1,6 @@
 import "./style.css";
-import { createInitialState, playClaim } from "./game/game";
+import type { CardId } from "./game/cards";
+import { createInitialState, playCard } from "./game/game";
 import { renderGame } from "./ui/render";
 
 const root = document.querySelector<HTMLElement>("#app");
@@ -12,13 +13,13 @@ const appRoot: HTMLElement = root;
 
 let gameState = createInitialState();
 
-function handlePlayClaim(): void {
-  gameState = playClaim(gameState);
+function handlePlayCard(cardId: CardId): void {
+  gameState = playCard(gameState, cardId);
   render();
 }
 
 function render(): void {
-  renderGame(appRoot, gameState, handlePlayClaim);
+  renderGame(appRoot, gameState, handlePlayCard);
 }
 
 render();

@@ -1,11 +1,11 @@
+import { getCard, type CardId } from "../game/cards";
 import {
-  CLAIM_DAMAGE,
   MAX_ROUNDS,
   OPPONENT_RESPONSE_DAMAGE,
   type GameState,
 } from "../game/game";
 
-export type PlayClaimHandler = () => void;
+export type PlayCardHandler = (cardId: CardId) => void;
 
 function createIntegrityPanel(label: string, value: number): HTMLElement {
   const panel = document.createElement("section");
@@ -23,24 +23,52 @@ function createIntegrityPanel(label: string, value: number): HTMLElement {
   return panel;
 }
 
+function createCardButton(
+  cardId: CardId,
+  isDisabled: boolean,
+  onPlayCard: PlayCardHandler,
+): HTMLButtonElement {
+  const card = getCard(cardId);
+  const button = document.createElement("button");
+  button.className = "debate-card";
+  button.type = "button";
+  button.disabled = isDisabled;
+  button.setAttribute("aria-label", `打出${card.name}：${card.description}`);
+  button.addEventListener("click", () => onPlayCard(cardId), { once: true });
+
+  const cardType = document.createElement("span");
+  cardType.className = "card-type";
+  cardType.textContent = card.category;
+
+  const cardName = document.createElement("strong");
+  cardName.textContent = card.name;
+
+  const cardEffect = document.createElement("span");
+  cardEffect.className = "card-effect";
+  cardEffect.textContent = card.description;
+
+  button.append(cardType, cardName, cardEffect);
+  return button;
+}
+
 export function renderGame(
   root: HTMLElement,
   state: GameState,
-  onPlayClaim: PlayClaimHandler,
+  onPlayCard: PlayCardHandler,
 ): void {
   const screen = document.createElement("div");
   screen.className = "game-screen";
 
   const eyebrow = document.createElement("p");
   eyebrow.className = "eyebrow";
-  eyebrow.textContent = "MVP-0 · VERTICAL SLICE 02";
+  eyebrow.textContent = "MVP-0 · VERTICAL SLICE 03";
 
   const title = document.createElement("h1");
   title.textContent = "三分钟辩论";
 
   const description = document.createElement("p");
   description.className = "description";
-  description.textContent = `五回合内击破对手。每次出牌后，对手会回应并使你损失 ${OPPONENT_RESPONSE_DAMAGE} 点完整度。`;
+  description.textContent = `五回合内击破对手。每回合三选一，对手通常回应 ${OPPONENT_RESPONSE_DAMAGE} 点。`;
 
   const roundIndicator = document.createElement("p");
   roundIndicator.className = "round-indicator";
@@ -53,25 +81,14 @@ export function renderGame(
     createIntegrityPanel("对手完整度", state.opponentIntegrity),
   );
 
-  const claimButton = document.createElement("button");
-  claimButton.className = "claim-card";
-  claimButton.type = "button";
-  claimButton.disabled = state.status !== "playing";
-  claimButton.setAttribute("aria-label", `打出主张，对手完整度减少 ${CLAIM_DAMAGE}`);
-  claimButton.addEventListener("click", onPlayClaim, { once: true });
-
-  const cardType = document.createElement("span");
-  cardType.className = "card-type";
-  cardType.textContent = "主张";
-
-  const cardName = document.createElement("strong");
-  cardName.textContent = "提出核心论点";
-
-  const cardEffect = document.createElement("span");
-  cardEffect.className = "card-effect";
-  cardEffect.textContent = `对手完整度 −${CLAIM_DAMAGE}`;
-
-  claimButton.append(cardType, cardName, cardEffect);
+  const cardRow = document.createElement("section");
+  cardRow.className = "card-row";
+  cardRow.setAttribute("aria-label", "本回合可选卡牌");
+  cardRow.append(
+    ...state.hand.map((cardId) =>
+      createCardButton(cardId, state.status !== "playing", onPlayCard),
+    ),
+  );
 
   const hint = document.createElement("p");
   hint.className = `hint status-${state.status}`;
@@ -84,7 +101,7 @@ export function renderGame(
     description,
     roundIndicator,
     integrityRow,
-    claimButton,
+    cardRow,
     hint,
   );
   root.replaceChildren(screen);
