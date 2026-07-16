@@ -54,9 +54,21 @@ h1 {
 
 .description {
   max-width: 34rem;
-  margin: 18px auto 32px;
+  margin: 18px auto 20px;
   color: #bcb5a8;
   line-height: 1.7;
+}
+
+.round-indicator {
+  width: max-content;
+  margin: 0 auto 24px;
+  padding: 7px 12px;
+  color: #d9c49b;
+  border: 1px solid #4a4135;
+  border-radius: 999px;
+  background: rgba(31, 29, 26, 0.7);
+  font-size: 0.82rem;
+  font-weight: 700;
 }
 
 .integrity-row {
@@ -112,6 +124,14 @@ h1 {
   box-shadow: 0 23px 52px rgba(0, 0, 0, 0.44);
 }
 
+.claim-card:disabled {
+  filter: grayscale(0.75);
+  cursor: not-allowed;
+  opacity: 0.48;
+  transform: none;
+  box-shadow: none;
+}
+
 .claim-card:focus-visible {
   outline: 3px solid #f4d58e;
   outline-offset: 5px;
@@ -141,6 +161,16 @@ h1 {
   margin: 22px 0 0;
   color: #817a70;
   font-size: 0.88rem;
+}
+
+.status-won {
+  color: #dbbf79;
+  font-weight: 700;
+}
+
+.status-lost {
+  color: #d58b7c;
+  font-weight: 700;
 }
 
 @media (max-width: 520px) {

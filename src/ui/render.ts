@@ -1,4 +1,9 @@
-import { CLAIM_DAMAGE, type GameState } from "../game/game";
+import {
+  CLAIM_DAMAGE,
+  MAX_ROUNDS,
+  OPPONENT_RESPONSE_DAMAGE,
+  type GameState,
+} from "../game/game";
 
 export type PlayClaimHandler = () => void;
 
@@ -28,14 +33,18 @@ export function renderGame(
 
   const eyebrow = document.createElement("p");
   eyebrow.className = "eyebrow";
-  eyebrow.textContent = "MVP-0 · VERTICAL SLICE 01";
+  eyebrow.textContent = "MVP-0 · VERTICAL SLICE 02";
 
   const title = document.createElement("h1");
   title.textContent = "三分钟辩论";
 
   const description = document.createElement("p");
   description.className = "description";
-  description.textContent = "先验证最短链路：点击卡牌，改变游戏状态，再更新界面。";
+  description.textContent = `五回合内击破对手。每次出牌后，对手会回应并使你损失 ${OPPONENT_RESPONSE_DAMAGE} 点完整度。`;
+
+  const roundIndicator = document.createElement("p");
+  roundIndicator.className = "round-indicator";
+  roundIndicator.textContent = `第 ${state.round} / ${MAX_ROUNDS} 回合`;
 
   const integrityRow = document.createElement("div");
   integrityRow.className = "integrity-row";
@@ -47,6 +56,7 @@ export function renderGame(
   const claimButton = document.createElement("button");
   claimButton.className = "claim-card";
   claimButton.type = "button";
+  claimButton.disabled = state.status !== "playing";
   claimButton.setAttribute("aria-label", `打出主张，对手完整度减少 ${CLAIM_DAMAGE}`);
   claimButton.addEventListener("click", onPlayClaim, { once: true });
 
@@ -64,10 +74,18 @@ export function renderGame(
   claimButton.append(cardType, cardName, cardEffect);
 
   const hint = document.createElement("p");
-  hint.className = "hint";
-  hint.textContent = "点击卡牌，观察对手完整度的变化。";
+  hint.className = `hint status-${state.status}`;
+  hint.setAttribute("role", "status");
+  hint.textContent = state.message;
 
-  screen.append(eyebrow, title, description, integrityRow, claimButton, hint);
+  screen.append(
+    eyebrow,
+    title,
+    description,
+    roundIndicator,
+    integrityRow,
+    claimButton,
+    hint,
+  );
   root.replaceChildren(screen);
 }
-
