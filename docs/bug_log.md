@@ -40,3 +40,6 @@ TypeScript 类型检查通过，Vite 生成生产构建。
 
 类型检查通过；Vite 成功生成 HTML、CSS 和 JavaScript 生产文件。
 
+### T5 回归确认
+
+2026-07-16 再次运行完整规则测试、100 个固定随机种子的模拟对局和 production build；BUG-001 未复现。
