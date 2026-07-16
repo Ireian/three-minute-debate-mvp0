@@ -4,6 +4,7 @@ import {
   createInitialState,
   drawHand,
   playCard,
+  restartGame,
   type GameState,
 } from "../src/game/game";
 
@@ -39,6 +40,16 @@ describe("MVP-0 turn resolution", () => {
       nextCardDamageBonus: 0,
     });
     expect(state.hand).toHaveLength(3);
+  });
+
+  it("restarts with full integrity and clears transient state", () => {
+    expect(restartGame(fixedRandom)).toMatchObject({
+      playerIntegrity: 10,
+      opponentIntegrity: 10,
+      round: 1,
+      status: "playing",
+      nextCardDamageBonus: 0,
+    });
   });
 
   it("resolves a supported claim, opponent response, and new hand", () => {

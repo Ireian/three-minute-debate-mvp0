@@ -42,6 +42,10 @@ export function createInitialState(
     nextCardDamageBonus: 0,
   };
 }
+
+export function restartGame(random: RandomSource = Math.random): GameState {
+  return createInitialState(random);
+}
 export function playCard(
   state: GameState,
   cardId: CardId,

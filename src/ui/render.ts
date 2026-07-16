@@ -6,6 +6,7 @@ import {
 } from "../game/game";
 
 export type PlayCardHandler = (cardId: CardId) => void;
+export type RestartHandler = () => void;
 
 function createIntegrityPanel(label: string, value: number): HTMLElement {
   const panel = document.createElement("section");
@@ -55,13 +56,14 @@ export function renderGame(
   root: HTMLElement,
   state: GameState,
   onPlayCard: PlayCardHandler,
+  onRestart: RestartHandler,
 ): void {
   const screen = document.createElement("div");
   screen.className = "game-screen";
 
   const eyebrow = document.createElement("p");
   eyebrow.className = "eyebrow";
-  eyebrow.textContent = "MVP-0 · VERTICAL SLICE 03";
+  eyebrow.textContent = "MVP-0 · 三分钟辩论";
 
   const title = document.createElement("h1");
   title.textContent = "三分钟辩论";
@@ -81,6 +83,30 @@ export function renderGame(
     createIntegrityPanel("对手完整度", state.opponentIntegrity),
   );
 
+  const statusPanel = document.createElement("section");
+  statusPanel.className = `status-panel status-${state.status}`;
+  statusPanel.setAttribute("aria-live", "polite");
+
+  const statusLabel = document.createElement("strong");
+  statusLabel.className = "status-label";
+  statusLabel.textContent =
+    state.status === "won"
+      ? "你赢了"
+      : state.status === "lost"
+        ? "辩论失败"
+        : "辩论进行中";
+
+  const statusMessage = document.createElement("span");
+  statusMessage.textContent = state.message;
+  statusPanel.append(statusLabel, statusMessage);
+
+  if (state.nextCardDamageBonus > 0 && state.status === "playing") {
+    const bonusBadge = document.createElement("span");
+    bonusBadge.className = "bonus-badge";
+    bonusBadge.textContent = `区分加成：下一张 +${state.nextCardDamageBonus}`;
+    statusPanel.append(bonusBadge);
+  }
+
   const cardRow = document.createElement("section");
   cardRow.className = "card-row";
   cardRow.setAttribute("aria-label", "本回合可选卡牌");
@@ -90,10 +116,12 @@ export function renderGame(
     ),
   );
 
-  const hint = document.createElement("p");
-  hint.className = `hint status-${state.status}`;
-  hint.setAttribute("role", "status");
-  hint.textContent = state.message;
+  const restartButton = document.createElement("button");
+  restartButton.className = "restart-button";
+  restartButton.type = "button";
+  restartButton.textContent = "重新开始";
+  restartButton.setAttribute("aria-label", "重新开始辩论");
+  restartButton.addEventListener("click", onRestart, { once: true });
 
   screen.append(
     eyebrow,
@@ -101,8 +129,9 @@ export function renderGame(
     description,
     roundIndicator,
     integrityRow,
+    statusPanel,
     cardRow,
-    hint,
+    restartButton,
   );
   root.replaceChildren(screen);
 }

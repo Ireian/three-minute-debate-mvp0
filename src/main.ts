@@ -1,6 +1,6 @@
 import "./style.css";
 import type { CardId } from "./game/cards";
-import { createInitialState, playCard } from "./game/game";
+import { createInitialState, playCard, restartGame } from "./game/game";
 import { renderGame } from "./ui/render";
 
 const root = document.querySelector<HTMLElement>("#app");
@@ -18,8 +18,13 @@ function handlePlayCard(cardId: CardId): void {
   render();
 }
 
+function handleRestart(): void {
+  gameState = restartGame();
+  render();
+}
+
 function render(): void {
-  renderGame(appRoot, gameState, handlePlayCard);
+  renderGame(appRoot, gameState, handlePlayCard, handleRestart);
 }
 
 render();
