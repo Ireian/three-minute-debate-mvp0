@@ -26,6 +26,8 @@
 - [ ] Test 4：Leader 亲自完成 Git commit、查看改动、回退和恢复。
 - [ ] Test 5：取得公开浏览器 URL，并在另一台设备运行。
 
+当前 blocker：本机尚未安装并登录 GitHub CLI，因此 GitHub Pages 部署尚未开始。
+
 未勾选的 Leader 测试不能由 Codex 代替通过。Codex 可以准备练习分支和逐步提示，但最终操作与解释必须由 Leader 完成。
 
 ## Scope 验收
