@@ -22,11 +22,12 @@
 
 - [ ] Test 1：Leader 亲自修改卡牌名称、数值和描述。
 - [ ] Test 2：Leader 亲自增加第七张卡并说明修改文件。
-- [x] Test 3：已记录并修复真实 BUG-001，回归构建通过。
+- [x] Test 3：已记录并修复真实 BUG-001 与 BUG-002，回归构建和云端部署通过。
 - [ ] Test 4：Leader 亲自完成 Git commit、查看改动、回退和恢复。
-- [ ] Test 5：取得公开浏览器 URL，并在另一台设备运行。
+- [x] Test 5a：取得公开浏览器 URL，并在发布设备完成线上交互验收。
+- [ ] Test 5b：Leader 在另一台设备打开公开 URL 并运行一局。
 
-当前 blocker：本机尚未安装并登录 GitHub CLI，因此 GitHub Pages 部署尚未开始。
+公开地址：https://ireian.github.io/three-minute-debate-mvp0/
 
 未勾选的 Leader 测试不能由 Codex 代替通过。Codex 可以准备练习分支和逐步提示，但最终操作与解释必须由 Leader 完成。
 

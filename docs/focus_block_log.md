@@ -55,10 +55,14 @@
 - 验收边界：演示分支通过测试只证明架构支持该操作，不代表 Leader 已通过 Test 1、Test 2 或 Test 4。
 - 下一个最小动作：T7，建立免费静态部署并取得公开浏览器 URL。
 
-## Block 07：公开部署前置检查
+## Block 07：免费公开部署与线上验收
 
 - 原计划：创建免费静态部署，取得公开浏览器 URL，并进行跨设备验证。
-- 实际结果：本地测试和 production build 通过；公开部署尚未完成。
-- Blocker：电脑未安装 GitHub CLI (`gh`)。GitHub 发布工作流要求 `gh` 已安装并完成登录，缺失时必须停止。当前仓库也尚无远程地址。
-- 已否决替代方案：不为使用 Sites 托管而把轻量 Vite 项目迁移成 Cloudflare Worker/vinext 架构，该变化超出 MVP-0 的必要复杂度。
-- 下一个最小动作：安装 GitHub CLI，运行 `gh auth login` 完成一次登录，然后由 Codex 创建远程仓库、配置 Pages、推送并验证 URL。
+- 实际结果：完成公开 GitHub 仓库、GitHub Pages 自动部署和发布设备上的线上交互验收。
+- 公开仓库：https://github.com/Ireian/three-minute-debate-mvp0
+- 公开游戏：https://ireian.github.io/three-minute-debate-mvp0/
+- 云端验收：GitHub Actions 中依赖安装、15 项自动测试、production build、Pages 上传和部署全部通过。
+- 浏览器验收：公开页面从第 1 回合 10/10 开始；点击“有据主张”后进入第 2 回合并变为玩家 8、对手 7；点击“重新开始”后恢复第 1 回合和 10/10。
+- 部署故障：首次 Linux 构建暴露跨平台可选依赖缺失，见 BUG-002；补全锁文件后通过。新仓库首次发布前还需启用 Pages 的 GitHub Actions 发布源，已完成一次性设置。
+- 剩余 Leader 验收：在另一台设备打开公开游戏并运行一局。该动作不能由当前发布设备代替。
+- 下一个最小动作：Leader 完成 Test 5b；之后再决定是否进入正式 Roguelite MVP，当前不自动扩 scope。
